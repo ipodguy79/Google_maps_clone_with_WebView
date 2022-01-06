@@ -13,7 +13,7 @@ import com.app.hotspringsofbritishcolumbia.models.UserMap
 
 const val EXTRA_USER_MAP = "EXTRA_USER_MAP"
 private const val REQUEST_CODE = 1234
-    private const val TAG = "MainActivity"
+private const val TAG = "MainActivity"
 private lateinit var rvMaps: RecyclerView
 class MainActivity : AppCompatActivity() {
 
@@ -29,15 +29,24 @@ class MainActivity : AppCompatActivity() {
         rvMaps.adapter = MapsAdapter(this, userMaps, object: MapsAdapter.OnClickListener {
             override fun onItemClick(position: Int) {
                 Log.i(TAG, "onItemClick $position")
+                Log.d(TAG, "onItemClick $position")
                 // When user taps on view in RV, navigate to new activity
-                val intent = Intent(this@MainActivity, DisplayMapActivity::class.java)
-                intent.putExtra(EXTRA_USER_MAP, userMaps[position])
-                startActivity(intent)
-                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                if (position == 0) {
+                    val intent1 = Intent(this@MainActivity, WebViewActivity::class.java)
+                    startActivity(intent1)
+                    overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                }
+                else {
+                    val intent2 = Intent(this@MainActivity, DisplayMapActivity::class.java)
+                    intent2.putExtra(EXTRA_USER_MAP, userMaps[position])
+                    startActivity(intent2)
+                    overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                }
             }
         })
 
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
@@ -48,6 +57,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun generateSampleData(): List<UserMap> {
         return listOf(
+            UserMap(
+                "Hot Springs Of BC Guide",
+                listOf()
+            ),
             UserMap(
                 "Undeveloped Springs",
                 listOf(
@@ -308,5 +321,6 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         )
-    }}
+    }
+}
 
