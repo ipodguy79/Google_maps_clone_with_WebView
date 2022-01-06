@@ -10,11 +10,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.app.hotspringsofbritishcolumbia.models.Place
 import com.app.hotspringsofbritishcolumbia.models.UserMap
 
+
 const val EXTRA_USER_MAP = "EXTRA_USER_MAP"
 private const val REQUEST_CODE = 1234
     private const val TAG = "MainActivity"
 private lateinit var rvMaps: RecyclerView
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

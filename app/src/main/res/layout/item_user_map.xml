@@ -6,6 +6,7 @@
     android:background="?attr/selectableItemBackground"
     android:padding="10dp"
     android:text="Hot Springs Of British Columbia"
+    android:textAlignment="center"
     android:textAllCaps="true"
     android:textColor="@android:color/holo_blue_dark"
     android:textSize="24sp"
