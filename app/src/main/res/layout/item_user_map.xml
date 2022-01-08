@@ -1,15 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/tvMapTitle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
+    android:layout_marginLeft="1pt"
+    android:layout_marginTop="0.5pt"
+    android:layout_marginRight="1pt"
+    android:layout_marginBottom="0.5pt"
+    android:background="#FFFFFF"
+    android:elevation="15dp"
+    android:fontFamily="serif"
+    android:lineSpacingExtra="4sp"
     android:padding="10dp"
     android:text="Hot Springs Of British Columbia"
     android:textAlignment="center"
     android:textAllCaps="true"
-    android:textColor="@android:color/holo_blue_dark"
+    android:textColor="@color/black"
+    android:textColorHint="#952196F3"
     android:textSize="24sp"
-    android:textStyle="bold">
+    android:textStyle="bold"
+    app:circularflow_radiusInDP="5dp"
+    app:layout_dodgeInsetEdges="all|right"
+    app:layout_marginBaseline="1pt">
 
 </TextView>

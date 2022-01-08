@@ -1,4 +1,4 @@
-package com.app.hotspringsofbritishcolumbia
+package com.app.hotspringsofbc
 
 import org.junit.Test
 
