@@ -8,7 +8,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -84,7 +83,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             boundsBuilder.include(latLng)
             mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID)
             mMap.addMarker(MarkerOptions().position(latLng).title(place.title).snippet(place.description).icon(
-                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
             )
 
         }

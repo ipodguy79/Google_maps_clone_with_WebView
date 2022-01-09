@@ -1,8 +1,10 @@
 package com.app.hotspringsofbc
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +14,7 @@ import android.view.MenuItem
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -29,9 +32,31 @@ import com.google.android.material.snackbar.Snackbar
 private const val TAG = "CreateMapActivity"
 class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    private val LOCATION_PERMISSION_REQUEST = 1
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityCreateMapBinding
     private var markers: MutableList<Marker> = mutableListOf()
+    private fun getLocationAccess() {
+
+    if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mMap.isMyLocationEnabled = true
+        }
+        else
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST)
+    }
+    @SuppressLint("MissingPermission")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST) {
+                if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
+                    mMap.isMyLocationEnabled = true
+                }
+                else {
+                    Toast.makeText(this, "User has not granted location access permission", Toast.LENGTH_LONG).show()
+                    finish()
+             }
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -89,20 +114,23 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        mMap.setOnInfoWindowClickListener { markerToDelete ->
-            Log.i(TAG, "onWindowClickListener- delete this marker")
-            markers.remove(markerToDelete)
-            markerToDelete.remove()
-        }
+
 
         mMap.setOnMapLongClickListener { latlng ->
             Log.i(TAG, "onMapLongClickListener")
             showAlertDialog(latlng)
 
         }
+        mMap.setOnInfoWindowClickListener { markerToDelete ->
+            Log.i(TAG, "onWindowClickListener - delete this marker")
+            markers.remove(markerToDelete)
+            markerToDelete.remove()
+        }
+
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 10f))
+        val BritishColumbia = LatLng(51.2, -120.6)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BritishColumbia, 7f))
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID)
     }
 
     private fun showAlertDialog(latlng: LatLng) {
@@ -122,9 +150,7 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 Toast.makeText(this, "Place must have non-empty title and description", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
-            val marker = mMap.addMarker(MarkerOptions().position(latlng)
-                .title(title)
-                .snippet("description"))
+            val marker = mMap.addMarker(MarkerOptions().position(latlng).title(title).snippet("description"))
             if (marker != null) {
                 markers.add(marker)
                 dialog.dismiss()

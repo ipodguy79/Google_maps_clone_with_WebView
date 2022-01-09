@@ -4,19 +4,17 @@ import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.hotspringsofbc.models.Place
 import com.app.hotspringsofbc.models.UserMap
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.*
 
@@ -38,9 +36,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         rvMaps = findViewById(R.id.rvMaps)
 
-        val userMapsFromFile = deserializeUserMaps(this)
-        userMaps = generateSampleData().toMutableList()
-        userMaps.addAll(userMapsFromFile)
+        userMaps = deserializeUserMaps(this).toMutableList()
         // Set layout manager on the recycler view
         rvMaps.layoutManager = LinearLayoutManager(this)
         // Set adapter on the recycler view
@@ -113,28 +109,26 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-
-
     private fun serializeUserMaps(context: Context, userMaps: List<UserMap>) {
         Log.i(TAG, "serializeUserMaps")
         ObjectOutputStream(FileOutputStream(getDataFile(context))).use { it.writeObject(userMaps) }
     }
-    private fun getDataFile(context: Context) : File {
-        Log.i(TAG,"Getting file from directory ${context.filesDir}")
-        return File(context.filesDir,FILENAME)
 
-    }
     private fun deserializeUserMaps(context: Context) : List<UserMap> {
         Log.i(TAG, "deserializeUserMaps")
         val dataFile = getDataFile(context)
         if (!dataFile.exists()) {
             Log.i(TAG, "Data file does not exist yet")
-        return emptyList()
+            return generateSampleData()
 
 
         }
         ObjectInputStream(FileInputStream(dataFile)).use {return it.readObject() as List<UserMap> }
-         }
+    }
+    private fun getDataFile(context: Context) : File {
+        Log.i(TAG,"Getting file from directory ${context.filesDir}")
+        return File(context.filesDir,FILENAME)
+    }
 
     private fun generateSampleData(): List<UserMap> {
         return listOf(
