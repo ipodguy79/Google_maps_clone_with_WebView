@@ -60,7 +60,10 @@
             android:label="@string/title_activity_display_map" />
         <activity
             android:name=".MainActivity"
-            android:exported="false"></activity>
+            android:exported="false"></activity >
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3164102735028580~5072905307"/>
     </application>
 
 </manifest>

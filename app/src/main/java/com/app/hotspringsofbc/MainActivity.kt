@@ -15,8 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.hotspringsofbc.models.Place
 import com.app.hotspringsofbc.models.UserMap
+import com.google.android.gms.ads.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.*
+
 
 const val EXTRA_USER_MAP = "EXTRA_USER_MAP"
 const val EXTRA_MAP_TITLE = "EXTRA_MAP_TITLE"
@@ -24,10 +26,13 @@ private const val FILENAME = "UserMaps.data"
 private const val REQUEST_CODE = 1234
 private const val TAG = "MainActivity"
 private lateinit var rvMaps: RecyclerView
+lateinit var mAdView : AdView
+
 
 class MainActivity : AppCompatActivity() {
 
 
+    private lateinit var adRequest: AdRequest
     private lateinit var userMaps: MutableList<UserMap>
     private lateinit var mapAdapter: MapsAdapter
 
@@ -35,6 +40,42 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         rvMaps = findViewById(R.id.rvMaps)
+        MobileAds.initialize(this) {}
+
+
+
+        mAdView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+
+        mAdView.adListener = object: AdListener() {
+            override fun onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            override fun onAdFailedToLoad(adError : LoadAdError) {
+                // Code to be executed when an ad request fails.
+            }
+
+            override fun onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            override fun onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            override fun onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+                Toast.makeText(this@MainActivity, "Thank You!",Toast.LENGTH_SHORT).show()
+
+            }
+        }
+
+
+        //Interstitial ads
 
         userMaps = deserializeUserMaps(this).toMutableList()
         // Set layout manager on the recycler view
@@ -92,7 +133,6 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra(EXTRA_MAP_TITLE, title)
             startActivityForResult(intent, REQUEST_CODE)
             dialog.dismiss()
-
 
         }
     }

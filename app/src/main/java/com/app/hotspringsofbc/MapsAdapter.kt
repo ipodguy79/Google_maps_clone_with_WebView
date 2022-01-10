@@ -20,6 +20,7 @@ class MapsAdapter(val context: Context,val userMaps: List<UserMap>, val onClickL
         val view = LayoutInflater.from(context).inflate(R.layout.item_user_map, parent,false)
         return ViewHolder(view)
 
+
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

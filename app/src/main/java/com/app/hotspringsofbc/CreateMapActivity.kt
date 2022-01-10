@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,19 +13,19 @@ import android.view.MenuItem
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-
+import com.app.hotspringsofbc.databinding.ActivityCreateMapBinding
+import com.app.hotspringsofbc.models.Place
+import com.app.hotspringsofbc.models.UserMap
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.app.hotspringsofbc.databinding.ActivityCreateMapBinding
-import com.app.hotspringsofbc.models.Place
-import com.app.hotspringsofbc.models.UserMap
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 
 private const val TAG = "CreateMapActivity"
@@ -70,7 +69,7 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         mapFragment.view?.let {
-            Snackbar.make(it, "Long press to add a marker!", Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(it, "Long press to add a marker,also tap a marker to remove(Before saving!)", Snackbar.LENGTH_INDEFINITE)
                 .setAction("OK", {})
                 .setActionTextColor(ContextCompat.getColor(this, android.R.color.white))
                 .show()
@@ -114,18 +113,17 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        mMap.setOnMarkerClickListener { marker ->
+            marker.remove()
+            true
+        }
 
 
         mMap.setOnMapLongClickListener { latlng ->
             Log.i(TAG, "onMapLongClickListener")
             showAlertDialog(latlng)
+        }
 
-        }
-        mMap.setOnInfoWindowClickListener { markerToDelete ->
-            Log.i(TAG, "onWindowClickListener - delete this marker")
-            markers.remove(markerToDelete)
-            markerToDelete.remove()
-        }
 
         // Add a marker in Sydney and move the camera
         val BritishColumbia = LatLng(51.2, -120.6)
