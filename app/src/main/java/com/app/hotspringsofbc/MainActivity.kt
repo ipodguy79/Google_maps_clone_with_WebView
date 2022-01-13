@@ -48,12 +48,12 @@ class MainActivity : AppCompatActivity() {
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
 
-        mAdView.adListener = object: AdListener() {
+        mAdView.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 // Code to be executed when an ad finishes loading.
             }
 
-            override fun onAdFailedToLoad(adError : LoadAdError) {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
                 // Code to be executed when an ad request fails.
             }
 
@@ -69,19 +69,17 @@ class MainActivity : AppCompatActivity() {
             override fun onAdClosed() {
                 // Code to be executed when the user is about to return
                 // to the app after tapping on an ad.
-                Toast.makeText(this@MainActivity, "Thank You!",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Thank You!", Toast.LENGTH_SHORT).show()
 
             }
         }
 
 
-        //Interstitial ads
-
         userMaps = deserializeUserMaps(this).toMutableList()
         // Set layout manager on the recycler view
         rvMaps.layoutManager = LinearLayoutManager(this)
         // Set adapter on the recycler view
-        mapAdapter = MapsAdapter(this, userMaps, object: MapsAdapter.OnClickListener {
+        mapAdapter = MapsAdapter(this, userMaps, object : MapsAdapter.OnClickListener {
             override fun onItemClick(position: Int) {
                 Log.i(TAG, "onItemClick $position")
                 Log.d(TAG, "onItemClick $position")
@@ -89,23 +87,30 @@ class MainActivity : AppCompatActivity() {
                 if (position == 0) {
                     val intent1 = Intent(this@MainActivity, WebViewActivity::class.java)
                     startActivity(intent1)
-                    overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-                }
-                else {
+                    overridePendingTransition(
+                        android.R.anim.slide_in_left,
+                        android.R.anim.slide_out_right
+                    )
+                } else {
                     val intent2 = Intent(this@MainActivity, DisplayMapActivity::class.java)
                     intent2.putExtra(EXTRA_USER_MAP, userMaps[position])
                     startActivity(intent2)
-                    overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                    overridePendingTransition(
+                        android.R.anim.slide_in_left,
+                        android.R.anim.slide_out_right
+                    )
                 }
             }
-        })
-        rvMaps.adapter =  mapAdapter
 
-        val floatingActionButton : FloatingActionButton = findViewById(R.id.floatingActionButton)
+        })
+        rvMaps.adapter = mapAdapter
+
+        val floatingActionButton: FloatingActionButton = findViewById(R.id.floatingActionButton)
         floatingActionButton.setOnClickListener {
-            Log.i(TAG,"Tap on FAB")
+            Log.i(TAG, "Tap on FAB")
             showAlertDialog()
         }
+
 
     }
 
@@ -123,7 +128,7 @@ class MainActivity : AppCompatActivity() {
             val title = mapFormView.findViewById<EditText>(R.id.etTitle).text.toString()
 
             if (title.trim().isEmpty()) {
-                Toast.makeText(this, "Map must have non-empty title", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "you must ad something in each space", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
@@ -136,7 +141,6 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             // Get new map data from the data
@@ -173,7 +177,7 @@ class MainActivity : AppCompatActivity() {
     private fun generateSampleData(): List<UserMap> {
         return listOf(
             UserMap(
-                "Hot Springs Of BC Guide",
+                "Hot Springs Of \nBC Guide",
                 listOf()
             ),
             UserMap(
@@ -267,8 +271,10 @@ class MainActivity : AppCompatActivity() {
 
                 )
             ),
-            UserMap("Partly Developed Springs",
+            UserMap(
+                "Partly Developed \nSprings",
                 listOf(
+                    Place("Halfway River Hot Springs	", "", 50.50510242027527, -117.78395161383057),
                     Place("Tsek/Skookumchuck Hot Springs", " ", 49.9667582, -122.434906),
                     Place("Hot Springs Cove", "", 49.348612, -126.260977),
                     Place("Scenic Hot Springs", "", 47.710455, -121.141949),
@@ -278,7 +284,8 @@ class MainActivity : AppCompatActivity() {
                     Place("Chief Shakes Hot Springs", "", 56.722971, -132.032318)
                 )
             ),
-            UserMap("Developed Springs",
+            UserMap(
+                "Developed Springs /\nResorts",
                 listOf(
                     Place("Harrison Hot Springs", "", 49.3036798, -121.7897531),
                     Place("Ainsworth Hot Springs", "Ainsworth Hot Springs Resort", 49.73555529, -116.9113443),
@@ -299,6 +306,52 @@ class MainActivity : AppCompatActivity() {
                 )
             ),
             UserMap(
+                "Springs With Campgrounds Nearby",
+                listOf(
+                    Place("Halfway River Hot Springs	", "", 50.50510242027527, -117.78395161383057),
+                    Place("Harrison Hot Springs", "", 49.3036798, -121.7897531),
+                    Place("Nakusp Hot Springs", "", 50.295042, -117.686234),
+                    Place("Canyon Hot Springs", "", 51.138102, -117.856261),
+                    Place("Fairmont Hot Springs", "", 50.3284092, -115.843314),
+                    Place("Liard River Hot Springs Provincial Park", "", 59.422378, -126.096268),
+                    Place("Takhini Hot Springs", "", 60.879681, -135.359802),
+                    Place("Canyon Hot Springs Source", "", 51.126900, -117.847346),
+                    Place("Hot Springs Cove", "", 49.348612, -126.260977),
+                    Place("Aiyansh Hot Springs", "", 55.139071,-129.35347),
+                    Place("Sloquet Hot Springs", " ", 49.75909, -122.230453),
+                    Place("Lussier Hot Springs", "", 50.13522498789943, -115.57688553107455),
+                    Place("Ram Creek Hot Springs", "", 50.03369936865966, -115.59179283593753),
+                    Place("Hobo Hot Springs", "", 49.303516, -121.791239)
+                )
+            ),
+            UserMap(
+                "Springs Only Acessable \nBy Boat",
+                listOf(
+                    Place("Hot Springs Cove", "", 49.348612, -126.260977),
+                    Place("Hotspring Island", "", 52.575498, -131.442379),
+                    Place("Chief Shakes Hot Springs", "", 56.722971, -132.032318),
+                    Place("Pitt River Hot Springs", "", 49.694729, -122.706985),
+                    Place("Octopus Creek Hot Springs", "", 49.736469, -118.079725),
+                    Place("Tallheo Hot Springs", "", 52.211624, -126.941273),
+                    Place("Tallheo Hot Springs 2", "", 52.206244, -126.937905),
+                    Place("Nascall Hot Springs", "", 52.49843310000001, -127.2707127),
+                    Place("Eucott Bay Hot Springs 2", "", 52.445596, -127.323095),
+                    Place("Eucott Bay Hot Springs ", "", 52.453348, -127.313719),
+                    Place("Khutze Inlet Warm Springs", "", 53.084028, -128.400882),
+                    Place("Klekane Inlet hot springs", "", 53.247267, -128.680634),
+                    Place("Goat Harbour Hot Spring", "", 53.359411, -128.879444),
+                    Place("Bishop Bay Hot Springs", "", 53.470509, -128.836147),
+                    Place("Shearwater (Europa Bay) Hot Springs", "", 53.449896, -128.568248),
+                    Place("Brim River Hot Springs", "", 53.513368, -128.369751),
+                    Place("Weewanie Hot Springs", "", 53.695922, -128.787918),
+                    Place("Frizzell Hotsprings", "", 54.199982, -129.8667273),
+                    Place("Tchentlo Lake Warm Springs", "", 55.227741, -125.249901),
+                    Place("Prophet River Hot Springs", "", 57.65083, -124.023333),
+                    Place("Toad Hot Springs", "", 58.923764, -125.091728),
+
+                    )
+            ),
+            UserMap(
                 "All Springs",
                 listOf(
                     Place("Harrison Hot Springs", "", 49.3036798, -121.7897531),
@@ -317,6 +370,7 @@ class MainActivity : AppCompatActivity() {
                         50.3284092,
                         -115.843314,
                     ),
+                    Place("Halfway River Hot Springs	", "", 50.50510242027527, -117.78395161383057),
                     Place("Radium Hot Springs", "", 50.6346824, -116.0390365),
                     Place("Cave and Basin National Historic Site", "", 51.170087, -115.589218),
                     Place("Banff Upper Hot Springs", "", 51.15114, -115.562096),
@@ -352,20 +406,10 @@ class MainActivity : AppCompatActivity() {
                     Place("Angel Warm Springs", "", 49.822084, -119.366356),
                     Place("Octopus Creek Hot Springs", "", 49.736469, -118.079725),
                     Place("St. Leon Hot Springs", "", 50.436079, -117.858582),
-                    Place(
-                        "Upper Halfway River Warm Springs",
-                        "",
-                        50.49801860418479,
-                        -117.65496978598023,
-                    ),
+                    Place("Upper Halfway River Warm Springs", "", 50.49801860418479, -117.65496978598023,),
                     Place("Taylor Warm Spring", "", 50.078295, -117.971191),
                     Place("Wilson Lake Warm Springs", "", 50.226128, -117.564628),
-                    Place(
-                        "Crawford Creek Warm Springs",
-                        "",
-                        49.71124423085244,
-                        -116.76093550799561,
-                    ),
+                    Place("Crawford Creek Warm Springs","",49.71124423085244,-116.76093550799561,),
                     Place("Dewar Creek Hot Springs", "", 49.95406390501944, -116.51588893145752),
                     Place("Fording Mountain (Sulphur) Warm Springs", "", 49.994278, -114.898281),
                     Place("Wild Horse Warm Springs", "", 49.816056, -115.481415),
@@ -434,6 +478,7 @@ class MainActivity : AppCompatActivity() {
                     Place("Meager Creek Hot Springs", "", 50.575486865389536, -123.46508481349184),
                     Place("Olympic Hot Springs", "", 47.978439, -123.678583),
                 )
+
             )
         )
     }

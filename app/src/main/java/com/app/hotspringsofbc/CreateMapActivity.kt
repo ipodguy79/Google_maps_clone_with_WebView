@@ -69,7 +69,7 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         mapFragment.view?.let {
-            Snackbar.make(it, "Long press to add a marker,also tap a marker to remove(Before saving!)", Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(it, "Long press to add a marker,also tap a marker to remove", Snackbar.LENGTH_INDEFINITE)
                 .setAction("OK", {})
                 .setActionTextColor(ContextCompat.getColor(this, android.R.color.white))
                 .show()
@@ -125,7 +125,6 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
 
-        // Add a marker in Sydney and move the camera
         val BritishColumbia = LatLng(51.2, -120.6)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BritishColumbia, 7f))
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID)

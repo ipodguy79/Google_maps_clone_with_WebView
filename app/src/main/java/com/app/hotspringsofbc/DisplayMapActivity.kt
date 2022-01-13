@@ -2,50 +2,71 @@ package com.app.hotspringsofbc
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.app.hotspringsofbc.databinding.ActivityDisplayMapBinding
+import com.app.hotspringsofbc.models.UserMap
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.app.hotspringsofbc.databinding.ActivityDisplayMapBinding
-import com.app.hotspringsofbc.models.UserMap
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.*
 
 private const val TAG = "DisplayMapActivity"
 class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    private var markers: MutableList<Marker> = mutableListOf()
     private val LOCATION_PERMISSION_REQUEST = 1
     private lateinit var mMap: GoogleMap
     private lateinit var userMap: UserMap
     private lateinit var binding: ActivityDisplayMapBinding
+
+
     private fun getLocationAccess() {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             mMap.isMyLocationEnabled = true
-        }
-        else
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST)
+        } else
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST
+            )
     }
+
+
     @SuppressLint("MissingPermission")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST) {
-                if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
-                    mMap.isMyLocationEnabled = true
-                }
-                else {
-                    Toast.makeText(this, "User has not granted location access permission", Toast.LENGTH_LONG).show()
-                    finish()
-             }
+            if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
+                mMap.isMyLocationEnabled = true
+            } else {
+                Toast.makeText(
+                    this,
+                    "User has not granted location access permission",
+                    Toast.LENGTH_LONG
+                ).show()
+                finish()
+            }
+
         }
+
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -55,14 +76,15 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         userMap = intent.getSerializableExtra(EXTRA_USER_MAP) as UserMap
 
 
-        supportActionBar?.title =userMap.title
+
+        supportActionBar?.title = userMap.title
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
 
-
     }
+
 
     /**
      * Manipulates the map once available.
@@ -77,6 +99,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
         getLocationAccess()
 
+
         Log.i(TAG, "user map to render: ${userMap.title}")
 
         val boundsBuilder = LatLngBounds.Builder()
@@ -84,11 +107,21 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             val latLng = LatLng(place.latitude, place.longitude)
             boundsBuilder.include(latLng)
             mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID)
-            mMap.addMarker(MarkerOptions().position(latLng).title(place.title).snippet(place.description).icon(
-                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+            mMap.addMarker(
+                MarkerOptions().position(latLng).title(place.title).snippet(place.description).icon(
+                    BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
+                )
             )
 
+
         }
-        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 1000, 1000, 0))
+        mMap.animateCamera(
+            CameraUpdateFactory.newLatLngBounds(
+                boundsBuilder.build(),
+                1000,
+                1000,
+                0
+            )
+        )
     }
 }
