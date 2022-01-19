@@ -10,35 +10,38 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.app.hotspringsofbc.databinding.ActivityDisplayMapBinding
 import com.app.hotspringsofbc.models.UserMap
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MarkerOptions
 
 private const val TAG = "DisplayMapActivity"
 class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private var markers: MutableList<Marker> = mutableListOf()
     private val LOCATION_PERMISSION_REQUEST = 1
     private lateinit var mMap: GoogleMap
     private lateinit var userMap: UserMap
     private lateinit var binding: ActivityDisplayMapBinding
 
 
+
     private fun getLocationAccess() {
         if (ContextCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.isMyLocationEnabled = true
         } else
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_PERMISSION_REQUEST
-            )
+                LOCATION_PERMISSION_REQUEST)
     }
 
 
@@ -95,6 +98,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         getLocationAccess()
@@ -114,6 +118,35 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             )
 
 
+        }
+        mAdView = findViewById(R.id.adView2)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+
+        mAdView.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                // Code to be executed when an ad request fails.
+            }
+
+            override fun onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            override fun onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            override fun onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+
+
+            }
         }
         mMap.animateCamera(
             CameraUpdateFactory.newLatLngBounds(

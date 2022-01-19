@@ -16,15 +16,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.app.hotspringsofbc.models.Place
 import com.app.hotspringsofbc.models.UserMap
 import com.google.android.gms.ads.*
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.play.core.review.ReviewManagerFactory
 import java.io.*
+
 
 
 const val EXTRA_USER_MAP = "EXTRA_USER_MAP"
 const val EXTRA_MAP_TITLE = "EXTRA_MAP_TITLE"
 private const val FILENAME = "UserMaps.data"
 private const val REQUEST_CODE = 1234
-private const val TAG = "MainActivity"
 private lateinit var rvMaps: RecyclerView
 lateinit var mAdView : AdView
 
@@ -32,9 +35,11 @@ lateinit var mAdView : AdView
 class MainActivity : AppCompatActivity() {
 
 
-    private lateinit var adRequest: AdRequest
     private lateinit var userMaps: MutableList<UserMap>
     private lateinit var mapAdapter: MapsAdapter
+    private var mInterstitialAd: InterstitialAd? = null
+    private var TAG = "MainActivity"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,30 +47,32 @@ class MainActivity : AppCompatActivity() {
         rvMaps = findViewById(R.id.rvMaps)
         MobileAds.initialize(this) {}
 
+        //val manager = FakeReviewManager(this)
+        val manager = ReviewManagerFactory.create(this)
+        val request = manager.requestReviewFlow()
+        request.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // We got the ReviewInfo object
+                val reviewInfo = task.result
 
+                val flow = manager.launchReviewFlow(this, reviewInfo)
+                flow.addOnCompleteListener { _ ->
+                    // The flow has finished. The API does not indicate whether the user
+                    // reviewed or not, or even whether the review dialog was shown. Thus, no
+                    // matter the result, we continue our app flow.
+                }
+            }
+            else {
+                // There was some problem, log or handle the error code.
+                //  @ReviewErrorCode val reviewErrorCode = (task.getException() as TaskException).errorCode
+            }
+        }
 
         mAdView = findViewById(R.id.adView)
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
 
         mAdView.adListener = object : AdListener() {
-            override fun onAdLoaded() {
-                // Code to be executed when an ad finishes loading.
-            }
-
-            override fun onAdFailedToLoad(adError: LoadAdError) {
-                // Code to be executed when an ad request fails.
-            }
-
-            override fun onAdOpened() {
-                // Code to be executed when an ad opens an overlay that
-                // covers the screen.
-            }
-
-            override fun onAdClicked() {
-                // Code to be executed when the user clicks on an ad.
-            }
-
             override fun onAdClosed() {
                 // Code to be executed when the user is about to return
                 // to the app after tapping on an ad.
@@ -74,6 +81,40 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        InterstitialAd.load(
+            this,
+            "ca-app-pub-3164102735028580/8317305309",
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    Log.d(TAG, adError.message)
+                    mInterstitialAd = null
+                }
+
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    Log.d(TAG, "Ad was loaded.")
+                    mInterstitialAd = interstitialAd
+                }
+            })
+        mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+                Log.d(TAG, "Ad was dismissed.")
+            }
+
+            override fun onAdFailedToShowFullScreenContent(adError: AdError?) {
+                Log.d(TAG, "Ad failed to show.")
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                Log.d(TAG, "Ad showed fullscreen content.")
+                mInterstitialAd = null
+            }
+        }
+        if (mInterstitialAd != null) {
+            mInterstitialAd?.show(this)
+        } else {
+            Log.d("TAG", "The interstitial ad wasn't ready yet.")
+        }
 
         userMaps = deserializeUserMaps(this).toMutableList()
         // Set layout manager on the recycler view
@@ -102,8 +143,29 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            override fun onItemLongClick(position: Int) {
+                Log.i(TAG, "onItemLongClick at position $position")
+                val dialog =
+                    AlertDialog.Builder(this@MainActivity)
+                        .setTitle("Delete this map?")
+                        .setMessage("Are you sure you want to delete this map?")
+                        .setNegativeButton("Cancel", null)
+                        .setPositiveButton("OK", null)
+                        .show()
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+                    userMaps.removeAt(position)
+                    mapAdapter.notifyItemRemoved(position)
+                    mapAdapter.notifyItemRangeChanged(position, mapAdapter.itemCount)
+                    serializeUserMaps(this@MainActivity, userMaps)
+                    dialog.dismiss()
+                }
+            }
         })
+        
         rvMaps.adapter = mapAdapter
+
+
+
 
         val floatingActionButton: FloatingActionButton = findViewById(R.id.floatingActionButton)
         floatingActionButton.setOnClickListener {
@@ -113,6 +175,7 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
 
     private fun showAlertDialog() {
         val mapFormView = LayoutInflater.from(this).inflate(R.layout.dialog_create_map, null)
@@ -183,7 +246,7 @@ class MainActivity : AppCompatActivity() {
             UserMap(
                 "Undeveloped Springs",
                 listOf(
-                    Place("Pitt River Hot Springs", "", 49.694729, -122.706985),
+                    Place("Pitt River Hot Springs", "https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194", 49.694729, -122.706985),
                     Place("Sloquet Hot Springs", " ", 49.75909, -122.230453),
                     Place("Clear Creek", "", 49.695396, -121.732979),
                     Place("Keyhole/Pebble Creek Hot Springs", "\"https://hotspringsofbc.ca/keyhole-hot-springs\"\"> Click Here For More Info </a>", 50.668131, -123.460576),
@@ -325,7 +388,7 @@ class MainActivity : AppCompatActivity() {
                 )
             ),
             UserMap(
-                "Springs Only Acessable \nBy Boat",
+                "Springs Only Accessibly \nBy Boat",
                 listOf(
                     Place("Hot Springs Cove", "", 49.348612, -126.260977),
                     Place("Hotspring Island", "", 52.575498, -131.442379),

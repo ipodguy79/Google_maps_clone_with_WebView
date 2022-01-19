@@ -9,14 +9,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.app.hotspringsofbc.models.UserMap
 
-private var onLongClickListener : View.OnLongClickListener? = null
-
 
 private const val TAG = "MapsAdapter"
-class MapsAdapter(val context: Context,val userMaps: List<UserMap>, val onClickListener: OnClickListener) : RecyclerView.Adapter<MapsAdapter.ViewHolder>() {
+class MapsAdapter(val context: Context, private val userMaps: List<UserMap>, private val onClickListener: OnClickListener) : RecyclerView.Adapter<MapsAdapter.ViewHolder>() {
 
     interface OnClickListener {
         fun onItemClick(position: Int)
+
+        fun onItemLongClick(position: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -29,6 +29,10 @@ class MapsAdapter(val context: Context,val userMaps: List<UserMap>, val onClickL
         holder.itemView.setOnClickListener {
             Log.i(TAG, "Tapped on position $position")
             onClickListener.onItemClick(position)
+        }
+        holder.itemView.setOnLongClickListener {
+            onClickListener.onItemLongClick(position)
+            return@setOnLongClickListener true
         }
         val textViewTitle = holder.itemView.findViewById<TextView>(R.id.tvMapTitle)
         textViewTitle.text = userMap.title

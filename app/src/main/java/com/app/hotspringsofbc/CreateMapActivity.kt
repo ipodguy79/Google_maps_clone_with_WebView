@@ -36,25 +36,41 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityCreateMapBinding
     private var markers: MutableList<Marker> = mutableListOf()
     private fun getLocationAccess() {
-
-    if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.isMyLocationEnabled = true
-        }
-        else
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST)
+        } else
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST)
     }
+
+
     @SuppressLint("MissingPermission")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST) {
-                if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
-                    mMap.isMyLocationEnabled = true
-                }
-                else {
-                    Toast.makeText(this, "User has not granted location access permission", Toast.LENGTH_LONG).show()
-                    finish()
-             }
+            if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
+                mMap.isMyLocationEnabled = true
+            } else {
+                Toast.makeText(
+                    this,
+                    "User has not granted location access permission",
+                    Toast.LENGTH_LONG
+                ).show()
+                finish()
+            }
+
         }
+
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +85,7 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         mapFragment.view?.let {
-            Snackbar.make(it, "Long press to add a marker,also tap a marker to remove", Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(it, "Long press to add a marker,also tap the info window to remove marker", Snackbar.LENGTH_INDEFINITE)
                 .setAction("OK", {})
                 .setActionTextColor(ContextCompat.getColor(this, android.R.color.white))
                 .show()
@@ -112,10 +128,14 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        getLocationAccess()
 
-        mMap.setOnMarkerClickListener { marker ->
-            marker.remove()
-            true
+        mMap.setOnInfoWindowClickListener { markerToDelete ->
+            Log.i(TAG, "onWindowClickListener- delete this marker")
+            markers.remove(markerToDelete)
+            markerToDelete.remove()
+            Toast.makeText(this, "Marker deleted", Toast.LENGTH_SHORT).show()
+
         }
 
 
@@ -127,7 +147,7 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val BritishColumbia = LatLng(51.2, -120.6)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BritishColumbia, 7f))
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID)
+        mMap.mapType = GoogleMap.MAP_TYPE_HYBRID
     }
 
     private fun showAlertDialog(latlng: LatLng) {
@@ -147,7 +167,7 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 Toast.makeText(this, "Place must have non-empty title and description", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
-            val marker = mMap.addMarker(MarkerOptions().position(latlng).title(title).snippet("description"))
+            val marker = mMap.addMarker(MarkerOptions().position(latlng).title(title).snippet("description").draggable(true))
             if (marker != null) {
                 markers.add(marker)
                 dialog.dismiss()
